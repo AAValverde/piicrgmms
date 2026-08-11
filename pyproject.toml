@@ -34,7 +34,8 @@ authors = [
 maintainers = [{name = "Adrian Valverde", email = "adrian.antonio.valverde@gmail.com"}]
 description = "A data analysis package for PI-ICR Mass Spectrometry"
 readme="README.md"
-license = {file = "LICENSE.txt"}
+license = "MIT"
+license-files = {"LICENSE","LICENSE_scikit_learn"}
 keywords=["Gaussian Mixture Models","Clustering Algorithms","Machine Learning","Mass Spectrometry"]
 classifiers=[
 "Development Status :: 4 - Beta",
