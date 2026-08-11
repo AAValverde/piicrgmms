@@ -20,12 +20,11 @@ requires = [
     "time",
     "math"
 ]
-
 build-backend = "setuptools.build_meta"
 
 [project]
+name = "piicrgmms"
 version = "0.1.5"
-name="piicrgmms"
 authors = [
 {name = "Colin Weber", email = "colin.weber.27@gmail.com"},
 {name = "Dwaipayan Ray"},
@@ -36,7 +35,11 @@ description = "A data analysis package for PI-ICR Mass Spectrometry"
 readme="README.md"
 license = "MIT"
 license-files = {"LICENSE","LICENSE_scikit_learn"}
-keywords=["Gaussian Mixture Models","Clustering Algorithms","Machine Learning","Mass Spectrometry"]
+keywords=[
+"Gaussian Mixture Models",
+"Clustering Algorithms",
+"Machine Learning",
+"Mass Spectrometry",]
 classifiers=[
 "Development Status :: 4 - Beta",
 "Programming Language :: Python :: 3",
