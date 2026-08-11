@@ -34,7 +34,8 @@ authors = [
 maintainers = [{name = "Adrian Valverde", email = "adrian.antonio.valverde@gmail.com"}]
 description = "A data analysis package for PI-ICR Mass Spectrometry"
 readme="README.md"
-keywords=['Gaussian Mixture Models','Clustering Algorithms','Machine Learning','Mass Spectrometry']
+license = {file = "LICENSE.txt"}
+keywords=["Gaussian Mixture Models","Clustering Algorithms","Machine Learning","Mass Spectrometry"]
 classifiers=[
 "Development Status :: 4 - Beta",
 "Programming Language :: Python :: 3",
@@ -46,6 +47,6 @@ classifiers=[
 "Topic :: Scientific/Engineering :: Artificial Intelligence",
 "Topic :: Scientific/Engineering :: Physics",
 [project.urls]
-Homepage: 'https://pypi.org/project/piicrgmms/'
-Repository: 'https://github.com/AAValverde/piicrgmms'
-Download: 'https://pypi.org/project/piicrgmms/#files'
+"Homepage" = "https://pypi.org/project/piicrgmms/"
+"Repository" = "https://github.com/AAValverde/piicrgmms"
+"Download" = "https://pypi.org/project/piicrgmms/#files"
