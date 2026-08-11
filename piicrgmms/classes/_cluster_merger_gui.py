@@ -1,18 +1,20 @@
 """Class for the GUI to assist with cluster merging."""
 
 from tkinter import Label
-from webcolors import CSS3_HEX_TO_NAMES, hex_to_rgb
+from webcolors import hex_to_rgb, name_to_hex
+from matplotlib.colors import to_rgba
+import webcolors
 from scipy.spatial import KDTree
-
 
 def css3_lists():
     """Return a list of all css3 color names, and a corresponding list of the colors' RGB values."""
-    css3_db = CSS3_HEX_TO_NAMES
+    css3_db = webcolors.names("css3")
     names = []
     rgb_values = []
-    for color_hex, color_name in css3_db.items():
+    for color_name in css3_db:
         names.append(color_name)
-        rgb_values.append(hex_to_rgb(color_hex))
+        #rgb_values.append(hex_to_rgb(name_to_hex(color_name)))
+        rgb_values.append(to_rgba(name_to_hex(color_name)))
 
     return names, rgb_values
 
@@ -36,4 +38,5 @@ class ClusterMergerGUI:
     def leftclick(self, event, np_image, color_list: list, names, kdt_db):
         distance, index = kdt_db.query(np_image[event.y, event.x])
         color = names[index]
+        print(color)
         color_list.append(color)

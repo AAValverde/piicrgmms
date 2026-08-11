@@ -17,7 +17,7 @@ from sklearn.base import BaseEstimator
 from sklearn.base import DensityMixin
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.utils import check_array, check_random_state
-from sklearn.utils.validation import check_is_fitted
+from sklearn.utils.validation import check_is_fitted, _check_n_features
 
 
 def _check_shape(param, param_shape, name):
@@ -220,14 +220,15 @@ class BaseMixture(DensityMixin, BaseEstimator, metaclass=ABCMeta):
             Component labels.
         """
         X = _check_X(X, self.n_components, ensure_min_samples=2)
-        self._check_n_features(X, reset=True)
+        #self._check_n_features(X, reset=True)
+        _check_n_features(self, X, reset=True)
         self._check_initial_parameters(X)
 
         # if we enable warm_start, we will have a unique initialisation
         do_init = not(self.warm_start and hasattr(self, 'converged_'))
         n_init = self.n_init if do_init else 1
 
-        max_lower_bound = -np.infty
+        max_lower_bound = -np.inf
         self.converged_ = False
 
         random_state = check_random_state(self.random_state)
@@ -239,7 +240,7 @@ class BaseMixture(DensityMixin, BaseEstimator, metaclass=ABCMeta):
             if do_init:
                 self._initialize_parameters(X, random_state)
 
-            lower_bound = (-np.infty if do_init else self.lower_bound_)
+            lower_bound = (-np.inf if do_init else self.lower_bound_)
 
             for n_iter in range(1, self.max_iter + 1):
                 prev_lower_bound = lower_bound
@@ -736,14 +737,15 @@ class PhaseConstrainedBaseMixture(DensityMixin, BaseEstimator, metaclass=ABCMeta
             Component labels.
         """
         X = _check_X(X, self.n_components, ensure_min_samples=2)
-        self._check_n_features(X, reset=True)
+        #self._check_n_features(X, reset=True)
+        _check_n_features(self, X, reset=True)
         self._check_initial_parameters(X)
 
         # if we enable warm_start, we will have a unique initialisation
         do_init = not(self.warm_start and hasattr(self, 'converged_'))
         n_init = self.n_init if do_init else 1
 
-        max_lower_bound = -np.infty
+        max_lower_bound = -np.inf
         self.converged_ = False
 
         random_state = check_random_state(self.random_state)
@@ -755,7 +757,7 @@ class PhaseConstrainedBaseMixture(DensityMixin, BaseEstimator, metaclass=ABCMeta
             if do_init:
                 self._initialize_parameters(X, random_state)
 
-            lower_bound = (-np.infty if do_init else self.lower_bound_)
+            lower_bound = (-np.inf if do_init else self.lower_bound_)
 
             for n_iter in range(1, self.max_iter + 1):
                 prev_lower_bound = lower_bound
@@ -830,14 +832,15 @@ class PhaseConstrainedBaseMixture(DensityMixin, BaseEstimator, metaclass=ABCMeta
             Component labels.
         """
         X = _check_X(X, self.n_components, ensure_min_samples=2)
-        self._check_n_features(X, reset=True)
+        #self._check_n_features(X, reset=True)
+        _check_n_features(self, X, reset=True)
         self._check_initial_parameters(X)
 
         # if we enable warm_start, we will have a unique initialisation
         do_init = not(self.warm_start and hasattr(self, 'converged_'))
         n_init = self.n_init if do_init else 1
 
-        max_lower_bound = -np.infty
+        max_lower_bound = -np.inf
         self.converged_ = False
 
         random_state = check_random_state(self.random_state)
@@ -849,7 +852,7 @@ class PhaseConstrainedBaseMixture(DensityMixin, BaseEstimator, metaclass=ABCMeta
             if do_init:
                 self._initialize_parameters(X, random_state)
 
-            lower_bound = (-np.infty if do_init else self.lower_bound_)
+            lower_bound = (-np.inf if do_init else self.lower_bound_)
 
             for n_iter in range(1, self.max_iter + 1):
                 prev_lower_bound = lower_bound
@@ -1361,14 +1364,15 @@ class StrictBayesianBaseModel(DensityMixin, BaseEstimator, metaclass=ABCMeta):
             Component labels.
         """
         X = _check_X(X, self.n_components, ensure_min_samples=2)
-        self._check_n_features(X, reset=True)
+        #self._check_n_features(X, reset=True)
+        _check_n_features(self, X, reset=True)
         self._check_initial_parameters(X)
 
         # if we enable warm_start, we will have a unique initialisation
         do_init = not(self.warm_start and hasattr(self, 'converged_'))
         n_init = self.n_init if do_init else 1
 
-        max_lower_bound = -np.infty
+        max_lower_bound = -np.inf
         self.converged_ = False
 
         random_state = check_random_state(self.random_state)
@@ -1380,7 +1384,7 @@ class StrictBayesianBaseModel(DensityMixin, BaseEstimator, metaclass=ABCMeta):
             if do_init:
                 self._initialize_parameters(X, random_state)
 
-            lower_bound = (-np.infty if do_init else self.lower_bound_)
+            lower_bound = (-np.inf if do_init else self.lower_bound_)
 
             for n_iter in range(1, self.max_iter + 1):
                 prev_lower_bound = lower_bound
@@ -1447,14 +1451,15 @@ class StrictBayesianBaseModel(DensityMixin, BaseEstimator, metaclass=ABCMeta):
             Component labels.
         """
         X = _check_X(X, self.n_components, ensure_min_samples=2)
-        self._check_n_features(X, reset=True)
+        #self._check_n_features(X, reset=True)
+        _check_n_features(self, X, reset=True)
         self._check_initial_parameters(X)
 
         # if we enable warm_start, we will have a unique initialisation
         do_init = not(self.warm_start and hasattr(self, 'converged_'))
         n_init = self.n_init if do_init else 1
 
-        max_lower_bound = -np.infty
+        max_lower_bound = -np.inf
         self.converged_ = False
 
         random_state = check_random_state(self.random_state)
@@ -1467,7 +1472,7 @@ class StrictBayesianBaseModel(DensityMixin, BaseEstimator, metaclass=ABCMeta):
                 mid_resp = self._strict_initialize_parameters(X, random_state)
                 old_resp = mid_resp
 
-            lower_bound = (-np.infty if do_init else self.lower_bound_)
+            lower_bound = (-np.inf if do_init else self.lower_bound_)
 
             for n_iter in range(1, self.max_iter + 1):
                 prev_lower_bound = lower_bound
