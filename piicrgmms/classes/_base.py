@@ -15,7 +15,6 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from PIL import Image, ImageTk
 from tkinter import Tk
-from io import BytesIO
 
 from ._cluster_merger_gui import ClusterMergerGUI
 
