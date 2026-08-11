@@ -33,7 +33,7 @@ authors = [
 maintainers = [{name = "Adrian Valverde", email = "adrian.antonio.valverde@gmail.com"}]
 description = "A data analysis package for PI-ICR Mass Spectrometry"
 readme="README.md"
-license = {text="MIT"}
+license = "MIT"
 license-files = ["LICENSE","LICENSE_scikit_learn"]
 keywords=[
 "Gaussian Mixture Models",
