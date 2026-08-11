@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from PIL import Image, ImageTk
 from tkinter import Tk
+from io import BytesIO
 
 from ._cluster_merger_gui import ClusterMergerGUI
 
@@ -430,20 +431,168 @@ class GaussianMixtureBase(metaclass=ABCMeta):
         plt.close()
 
         fig, _ = self.get_results_fig(data_frame_object=data_frame_object)
-
+        
         canvas = FigureCanvas(fig)  # Initialize the canvas, which is the renderer that works with RGB values
-        canvas.draw()  # Draw the canvas and cache the renderer
-        ncols, nrows = fig.canvas.get_width_height()
-        np_image = np.frombuffer(canvas.tostring_rgb(), dtype='uint8').reshape((nrows, ncols, 3))
-        # Convert figure to np_array, which is also an OpenCV image
-        PIL_image = Image.fromarray(np_image).convert('RGB')  # Convert np array image to PIL image
+        canvas.draw() # Draw the canvas and cache the renderer
+        
+        #Convert canvas to np array image (Broken by elimination of .tostring_rgb())
+        #ncols, nrows = fig.canvas.get_width_height()
+        #np_image = np.frombuffer(canvas.tostring_rgb(), dtype='uint8').reshape((nrows, ncols, 3))
+        #New conversion to np array image, broken for unknown reason
+        buffer=canvas.buffer_rgba()
+        np_image=np.asarray(buffer, dtype=np.uint8)
+        #plt.imshow(np_image)
+        # Convert figure to np_array, which is also an OpenCV image (Old)
+        PIL_image = Image.fromarray(np_image)
+        #display(PIL_image)
+
+        
 
         color_list = []  # Initialize cluster list
 
         return fig, canvas, np_image, PIL_image, color_list
 
     def cluster_merger(self, data_frame_object):
-        """Merge clusters into one spot in the case of an over-fitting error.
+        """
+        NON-GUI version of cluster_merge_gui.
+        Merge clusters into one spot in the case of an over-fitting error.
+
+        After showing the initial results of a clustering fit, this
+        module allows the user to select multiple clusters to merge
+        into a single cluster by specifying their color. Once the clusters
+        are selected, the fit attributes 'n_comps_found_', 'labels_',
+        'unique_labels_', 'colors_', and 'ips_', 'centers_array_', and
+        'noise_colors_' are updated. The process
+        repeats until all spots have been addressed. Before closing,
+        it creates a final matplotlib figure of the results and returns
+        it along with a save_string.
+
+        Parameters
+        ----------
+        data_frame_object : DataFrame class object
+            The object that contains the processed data and
+            information that is used by the algorithms to do the
+            fits.
+
+        Returns
+        -------
+        fig : matplotlib figure object
+            The figure containing the clustered results.
+
+        save_string : str
+            The recommended file name to use when saving the plot,
+            which is done separately.
+        """
+        if not self.clustered_:
+            raise NotImplementedError("Must run a method to cluster the "
+                                      "data before visualization.")
+
+        fig, canvas, np_image, PIL_image, color_list = self._set_gui(data_frame_object=data_frame_object)
+
+        done = False
+
+        while not done:
+            print("Look at the image and decide if there are any clusters you "
+                  "want to merge. Once decided, close the window.")
+            plt.show()
+            merge = input("Are there clusters you want to merge? [y/n]")
+            if merge == 'y':
+                print("Identify the clusters you want to merge by writing the color in lower case and hitting enter.\n"
+                      "If there are multiple spots you want to do this with, wait for the next prompt.")
+                color1= input("First Color:")
+                color2= input("Second Color:")
+                
+                color_list=[color1,color2]
+
+                brk = False
+                if len(tuple(color_list)) > 1:
+                    colors = ['blue', 'salmon', 'green', 'cadetblue', 'yellow',
+                              'cyan', 'indianred', 'chartreuse', 'seagreen',
+                              'darkorange', 'purple', 'aliceblue', 'olivedrab',
+                              'deeppink', 'tan', 'rosybrown', 'khaki',
+                              'aquamarine', 'cornflowerblue', 'saddlebrown',
+                              'lightgray']
+                    # Alternative colors that are nameless but maximize
+                    # contrast in both hue and lightness.
+                    # colors = ['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99',
+                    #           '#e31a1c','#fdbf6f','#ff7f00','#cab2d6','#6a3d9a',
+                    #           '#ffff99','#b15928']
+
+                    # Find indexes of colors
+                    true_index_list = []  # Corresponds to the indices of the clusters in centers_array
+                    cluster_index_list = []  # Corresponds to the indices of the clusters relative to labels_ and colors
+                    for color in color_list:
+                        try:
+                            true_index_list.append(self.colors_.index(color))
+                            cluster_index_list.append(colors.index(color))
+                        except ValueError:
+                            print("One of the colors selected, %s, doesn't match any cluster colors. "
+                                  "Please try again." % color)
+                            brk = True
+
+                    if not brk:
+                        ips_list = list(self.ips_)
+                        max_ips = max(self.ips_[true_index_list])
+                        true_index_keep = ips_list.index(max_ips)
+                        cluster_index_keep = cluster_index_list[true_index_list.index(true_index_keep)]
+                        other_true_indices = [i for i in true_index_list if i != true_index_keep]
+                        other_true_indices.sort(reverse=True)
+                        other_cluster_indices = [i for i in cluster_index_list if i != cluster_index_keep]
+                        other_cluster_indices.sort(reverse=True)
+
+                        # Adjust fit results accordingly
+                        keeper_indices = list(range(self.n_comps_found_))
+                        for i in other_true_indices:
+                            keeper_indices.remove(i)
+                        self.centers_array_ = self.centers_array_[keeper_indices, :]
+                        self.n_comps_found_ -= len(other_true_indices)
+                        for i in other_true_indices:
+                            self.colors_.remove(self.colors_[i])
+                        for i in other_cluster_indices:
+                            self.labels_ = np.where(self.labels_ == i, cluster_index_keep, self.labels_)
+                        self.unique_labels_ = np.unique(self.labels_)
+                        labels_list = list(self.labels_)
+                        ips = []
+                        for n in self.unique_labels_:
+                            cluster_ions = labels_list.count(n)
+                            ips.append(cluster_ions)
+                        self.ips_ = np.array(ips).reshape(-1, )
+
+                        merged_cluster_true_index = \
+                            true_index_keep - \
+                            sum([1 if other_true_indices[x] < true_index_keep
+                                 else 0 for x in range(len(other_true_indices))])
+
+                        # Recalculate centers, but only for the merged clusters
+                        self.recalculate_centers_uncertainties(data_frame_object=data_frame_object,
+                                                               indices=merged_cluster_true_index)
+
+                        if self.n_comps_found_ == 1:
+                            break
+                else:
+                    if not brk:
+                        print("Please select at least 2 clusters. If there are no more merges you want "
+                              "to perform, enter 'n' when prompted.")
+
+                fig, canvas, np_image, PIL_image, color_list = self._set_gui(
+                    data_frame_object=data_frame_object)
+
+            elif merge == 'n':
+                done = True
+            else:
+                print("Invalid response. Please enter either 'y' or 'n'.")
+
+                fig, canvas, np_image, PIL_image, color_list = self._set_gui(
+                    data_frame_object=data_frame_object)
+
+        fig, save_string = self.get_results_fig(data_frame_object=data_frame_object)
+
+        return fig, save_string
+    
+    def cluster_merger_gui(self, data_frame_object):
+        """
+        Currently nonfuctional GUI-based cluster merging
+        Merge clusters into one spot in the case of an over-fitting error.
 
         After showing the initial results of a clustering fit, this
         module allows the user to select multiple clusters to merge
